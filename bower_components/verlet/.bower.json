@@ -1,0 +1,14 @@
+{
+  "name": "verlet",
+  "homepage": "https://github.com/subprotocol/verlet-js",
+  "_release": "271af75394",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "271af753940d8eb67cd2b0b37934d204ab2497da"
+  },
+  "_source": "git://github.com/subprotocol/verlet-js.git",
+  "_target": "*",
+  "_originalSource": "verlet",
+  "_direct": true
+}
