@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Play Area</title>
+</head>
+<body>
+    <canvas id="crochet" style="width: 800px; height: 400px;"></canvas>
+    <input type="text" data-bind="value: spec" />
+    <script type="text/javascript" src="bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/knockout.js/knockout.js"></script>
+    <script type="text/javascript" src="js/Model.js"></script>
+    <script type="text/javascript">
+        $(function(){
+
+            var model = new Model("L");
+
+            ko.applyBindings(model);
+
+            console.log("Binding applied");
+        });
+    </script>
+</body>
+</html>
