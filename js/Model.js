@@ -9,7 +9,7 @@
     }
 
     Forward.prototype.accept = function(visitor) {
-      return visitor.visitForward(1);
+      return visitor.visitForward(1.0);
     };
 
     return Forward;

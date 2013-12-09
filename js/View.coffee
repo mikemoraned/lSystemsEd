@@ -2,24 +2,25 @@ class Link
   constructor: (@startParticle, @extent, @direction, @nextLinks) ->
 
   endParticle: () =>
-    new Particle(@startParticle.pos,@direction.scale(@extent))
+    new Particle(@startParticle.pos.add(@direction.scale(@extent)))
 
 class InstructionVisitor
 
   constructor: (@origin) ->
     @nextStartParticle = new Particle(@origin)
-    @direction = new Vec2(0.0, 1.0)
+    @direction = new Vec2(0.0, -1.0)
     @composite = null
     @parent = null
+    @stride = 20.0
 
   visitForward: (extent) =>
 
     if @parent?
-      link = new Link(@parent.endParticle(), extent, @direction, [])
+      link = new Link(@parent.endParticle(), extent * @stride, @direction, [])
       @parent.nextLinks.push(link)
       @parent = link
     else
-      @parent = new Link(new Particle(@origin), extent, @direction, [])
+      @parent = new Link(new Particle(@origin), extent * @stride, @direction, [])
 
     if !@composite?
       @composite = new VerletJS.Composite()
@@ -50,7 +51,7 @@ class View
     # simulation
     @sim = new VerletJS(width, height, canvas)
     @sim.friction = 0.3
-#    @sim.gravity = new Vec2(0.0, 0.0)
+    @sim.gravity = new Vec2(0.0, 0.0)
 
     # starting entities
     @origin = new Vec2(width/2, 3*height/4)
@@ -61,7 +62,7 @@ class View
 #
 #    @sim.composites.push(composite)
 
-    @root = null
+    @_onEvaluationChange(@model.evaluated())
 
     # animation loop
     @_loop()

@@ -1,6 +1,6 @@
 class Forward
   accept: (visitor) =>
-    visitor.visitForward(1)
+    visitor.visitForward(1.0)
 
 class Nested
   constructor: (@nested) ->

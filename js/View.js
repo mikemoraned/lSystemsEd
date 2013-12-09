@@ -13,7 +13,7 @@
     }
 
     Link.prototype.endParticle = function() {
-      return new Particle(this.startParticle.pos, this.direction.scale(this.extent));
+      return new Particle(this.startParticle.pos.add(this.direction.scale(this.extent)));
     };
 
     return Link;
@@ -26,19 +26,20 @@
       this.visitNested = __bind(this.visitNested, this);
       this.visitForward = __bind(this.visitForward, this);
       this.nextStartParticle = new Particle(this.origin);
-      this.direction = new Vec2(0.0, 1.0);
+      this.direction = new Vec2(0.0, -1.0);
       this.composite = null;
       this.parent = null;
+      this.stride = 20.0;
     }
 
     InstructionVisitor.prototype.visitForward = function(extent) {
       var link;
       if (this.parent != null) {
-        link = new Link(this.parent.endParticle(), extent, this.direction, []);
+        link = new Link(this.parent.endParticle(), extent * this.stride, this.direction, []);
         this.parent.nextLinks.push(link);
         this.parent = link;
       } else {
-        this.parent = new Link(new Particle(this.origin), extent, this.direction, []);
+        this.parent = new Link(new Particle(this.origin), extent * this.stride, this.direction, []);
       }
       if (this.composite == null) {
         this.composite = new VerletJS.Composite();
@@ -80,8 +81,9 @@
       canvas.getContext("2d").scale(dpr, dpr);
       this.sim = new VerletJS(width, height, canvas);
       this.sim.friction = 0.3;
+      this.sim.gravity = new Vec2(0.0, 0.0);
       this.origin = new Vec2(width / 2, 3 * height / 4);
-      this.root = null;
+      this._onEvaluationChange(this.model.evaluated());
       return this._loop();
     };
 
