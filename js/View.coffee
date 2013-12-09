@@ -5,10 +5,11 @@ class Root
   endParticle: () => @end
 
 class Link
-  constructor: (@name, @color, @parent, @startParticle, @extent, @direction, @nextLink = null) ->
+  constructor: (@name, @color, @startParticle, @extent, @direction) ->
     @end = new Particle(@startParticle.pos.add(@direction.scale(@extent)))
     @end.link = this
     @dead = false
+    @nextLink = null
 
   endParticle: () => @end
 
@@ -28,17 +29,11 @@ class InstructionVisitor
 
   visitForward: (name, color, extent) =>
 
-    if @parent.nextLink?
-      if @parent.nextLink.name == name
-        @parent.nextLink.dead = false
-        @parent = @parent.nextLink
-      else
-        link = new Link(name, color, @parent, @parent.endParticle(), extent * @stride, @direction)
-        @parent.nextLink = link
-        @parent = link
-        @_addParticle(link.endParticle())
+    if @parent.nextLink? && @parent.nextLink.name == name
+      @parent.nextLink.dead = false
+      @parent = @parent.nextLink
     else
-      link = new Link(name, color, @parent, @parent.endParticle(), extent * @stride, @direction)
+      link = new Link(name, color, @parent.endParticle(), extent * @stride, @direction)
       @parent.nextLink = link
       @parent = link
       @_addParticle(link.endParticle())
@@ -54,10 +49,17 @@ class InstructionVisitor
   _drawParticles: (ctx, composite) =>
     for particle in composite.particles
       if particle.link?
+        start = particle.link.startParticle
+        end = particle
         ctx.beginPath()
-        ctx.arc(particle.pos.x, particle.pos.y, 2, 0, 2*Math.PI)
+        ctx.arc(end.pos.x, end.pos.y, 2, 0, 2*Math.PI)
         ctx.fillStyle = particle.link.color
         ctx.fill()
+        ctx.beginPath()
+        ctx.moveTo(start.pos.x, start.pos.y)
+        ctx.lineTo(end.pos.x, end.pos.y)
+        ctx.strokeStyle = "gray"
+        ctx.stroke()
 
   visitNested: (nested) =>
     for instruction in nested

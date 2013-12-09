@@ -20,19 +20,18 @@
   })();
 
   Link = (function() {
-    function Link(name, color, parent, startParticle, extent, direction, nextLink) {
+    function Link(name, color, startParticle, extent, direction) {
       this.name = name;
       this.color = color;
-      this.parent = parent;
       this.startParticle = startParticle;
       this.extent = extent;
       this.direction = direction;
-      this.nextLink = nextLink != null ? nextLink : null;
       this.markDead = __bind(this.markDead, this);
       this.endParticle = __bind(this.endParticle, this);
       this.end = new Particle(this.startParticle.pos.add(this.direction.scale(this.extent)));
       this.end.link = this;
       this.dead = false;
+      this.nextLink = null;
     }
 
     Link.prototype.endParticle = function() {
@@ -68,18 +67,11 @@
 
     InstructionVisitor.prototype.visitForward = function(name, color, extent) {
       var link;
-      if (this.parent.nextLink != null) {
-        if (this.parent.nextLink.name === name) {
-          this.parent.nextLink.dead = false;
-          return this.parent = this.parent.nextLink;
-        } else {
-          link = new Link(name, color, this.parent, this.parent.endParticle(), extent * this.stride, this.direction);
-          this.parent.nextLink = link;
-          this.parent = link;
-          return this._addParticle(link.endParticle());
-        }
+      if ((this.parent.nextLink != null) && this.parent.nextLink.name === name) {
+        this.parent.nextLink.dead = false;
+        return this.parent = this.parent.nextLink;
       } else {
-        link = new Link(name, color, this.parent, this.parent.endParticle(), extent * this.stride, this.direction);
+        link = new Link(name, color, this.parent.endParticle(), extent * this.stride, this.direction);
         this.parent.nextLink = link;
         this.parent = link;
         return this._addParticle(link.endParticle());
@@ -97,16 +89,23 @@
     };
 
     InstructionVisitor.prototype._drawParticles = function(ctx, composite) {
-      var particle, _i, _len, _ref, _results;
+      var end, particle, start, _i, _len, _ref, _results;
       _ref = composite.particles;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         particle = _ref[_i];
         if (particle.link != null) {
+          start = particle.link.startParticle;
+          end = particle;
           ctx.beginPath();
-          ctx.arc(particle.pos.x, particle.pos.y, 2, 0, 2 * Math.PI);
+          ctx.arc(end.pos.x, end.pos.y, 2, 0, 2 * Math.PI);
           ctx.fillStyle = particle.link.color;
-          _results.push(ctx.fill());
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(start.pos.x, start.pos.y);
+          ctx.lineTo(end.pos.x, end.pos.y);
+          ctx.strokeStyle = "gray";
+          _results.push(ctx.stroke());
         } else {
           _results.push(void 0);
         }
