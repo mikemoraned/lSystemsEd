@@ -4,12 +4,13 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Forward = (function() {
-    function Forward() {
+    function Forward(name) {
+      this.name = name;
       this.accept = __bind(this.accept, this);
     }
 
     Forward.prototype.accept = function(visitor) {
-      return visitor.visitForward(1.0);
+      return visitor.visitForward(this.name, 1.0);
     };
 
     return Forward;
@@ -34,10 +35,11 @@
     function Model(spec) {
       var _this = this;
       if (spec == null) {
-        spec = "L";
+        spec = "A";
       }
       this.commands = {};
-      this.commands["L"] = new Forward();
+      this.commands["A"] = new Forward("A");
+      this.commands["B"] = new Forward("B");
       this.spec = ko.observable(spec);
       this.evaluated = ko.computed(function() {
         return new Nested(_this.spec().split("").map(function(i) {
