@@ -5,53 +5,59 @@ class Root
   endParticle: () => @end
 
 class Link
-  constructor: (@name, @parent, @startParticle, @extent, @direction, @nextLink = null) ->
+  constructor: (@name, @color, @parent, @startParticle, @extent, @direction, @nextLink = null) ->
     @end = new Particle(@startParticle.pos.add(@direction.scale(@extent)))
+    @end.link = this
+    @dead = false
 
   endParticle: () => @end
+
+  markDead: () =>
+    if @nextLink?
+      @nextLink.markDead()
+    @dead = true
 
 class InstructionVisitor
 
   constructor: (@origin, @parent) ->
-    @nextStartParticle = new Particle(@origin)
     @direction = new Vec2(0.0, -1.0)
-    @composite = null
     @stride = 20.0
-    @prune = null
+    @composite = null
+    if @parent.nextLink?
+      @parent.nextLink.markDead()
 
-  visitForward: (name, extent) =>
+  visitForward: (name, color, extent) =>
 
     if @parent.nextLink?
       if @parent.nextLink.name == name
+        @parent.nextLink.dead = false
         @parent = @parent.nextLink
-        @prune = @parent
       else
-        link = new Link(name, @parent, @parent.endParticle(), extent * @stride, @direction)
+        link = new Link(name, color, @parent, @parent.endParticle(), extent * @stride, @direction)
         @parent.nextLink = link
         @parent = link
         @_addParticle(link.endParticle())
-        @prune = null
     else
-      link = new Link(name, @parent, @parent.endParticle(), extent * @stride, @direction)
+      link = new Link(name, color, @parent, @parent.endParticle(), extent * @stride, @direction)
       @parent.nextLink = link
       @parent = link
-      @_addParticle(link.startParticle)
-      @prune = null
-
-  markDeadParticles: () =>
-    dead = @_markDeadParticles(@prune)
-    @prune.parent.nextLink = null
-    dead
-
-  _markDeadParticles: (curr) =>
-    if curr?
-      curr.endParticle().dead = true
-      @_markDeadParticles(curr.nextLink)
+      @_addParticle(link.endParticle())
 
   _addParticle: (particle) =>
+    console.log("add")
+    console.dir(particle)
     if !@composite?
       @composite = new VerletJS.Composite()
+      @composite.drawParticles = @_drawParticles
     @composite.particles.push(particle)
+
+  _drawParticles: (ctx, composite) =>
+    for particle in composite.particles
+      if particle.link?
+        ctx.beginPath()
+        ctx.arc(particle.pos.x, particle.pos.y, 2, 0, 2*Math.PI)
+        ctx.fillStyle = particle.link.color
+        ctx.fill()
 
   visitNested: (nested) =>
     for instruction in nested
@@ -99,16 +105,15 @@ class View
     change.accept(visitor)
     if visitor.composite?
       @sim.composites.push(visitor.composite)
-    if visitor.prune?
-      visitor.markDeadParticles()
-      @_removeDeadParticles()
+    @_removeDeadParticles()
 
   _removeDeadParticles: () =>
     console.dir()
     for composite in @sim.composites
       console.log("before/after")
       console.dir(composite.particles)
-      composite.particles = _.filter(composite.particles, (p) => !p.dead?)
+      composite.particles = _.filter(composite.particles, (p) => !p.link?.dead)
       console.dir(composite.particles)
+    @sim.composites = _.filter(@sim.composites, (c) => c.particles.length > 0)
 
 window.View = View

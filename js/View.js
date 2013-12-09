@@ -20,19 +20,30 @@
   })();
 
   Link = (function() {
-    function Link(name, parent, startParticle, extent, direction, nextLink) {
+    function Link(name, color, parent, startParticle, extent, direction, nextLink) {
       this.name = name;
+      this.color = color;
       this.parent = parent;
       this.startParticle = startParticle;
       this.extent = extent;
       this.direction = direction;
       this.nextLink = nextLink != null ? nextLink : null;
+      this.markDead = __bind(this.markDead, this);
       this.endParticle = __bind(this.endParticle, this);
       this.end = new Particle(this.startParticle.pos.add(this.direction.scale(this.extent)));
+      this.end.link = this;
+      this.dead = false;
     }
 
     Link.prototype.endParticle = function() {
       return this.end;
+    };
+
+    Link.prototype.markDead = function() {
+      if (this.nextLink != null) {
+        this.nextLink.markDead();
+      }
+      return this.dead = true;
     };
 
     return Link;
@@ -44,58 +55,63 @@
       this.origin = origin;
       this.parent = parent;
       this.visitNested = __bind(this.visitNested, this);
+      this._drawParticles = __bind(this._drawParticles, this);
       this._addParticle = __bind(this._addParticle, this);
-      this._markDeadParticles = __bind(this._markDeadParticles, this);
-      this.markDeadParticles = __bind(this.markDeadParticles, this);
       this.visitForward = __bind(this.visitForward, this);
-      this.nextStartParticle = new Particle(this.origin);
       this.direction = new Vec2(0.0, -1.0);
-      this.composite = null;
       this.stride = 20.0;
-      this.prune = null;
+      this.composite = null;
+      if (this.parent.nextLink != null) {
+        this.parent.nextLink.markDead();
+      }
     }
 
-    InstructionVisitor.prototype.visitForward = function(name, extent) {
+    InstructionVisitor.prototype.visitForward = function(name, color, extent) {
       var link;
       if (this.parent.nextLink != null) {
         if (this.parent.nextLink.name === name) {
-          this.parent = this.parent.nextLink;
-          return this.prune = this.parent;
+          this.parent.nextLink.dead = false;
+          return this.parent = this.parent.nextLink;
         } else {
-          link = new Link(name, this.parent, this.parent.endParticle(), extent * this.stride, this.direction);
+          link = new Link(name, color, this.parent, this.parent.endParticle(), extent * this.stride, this.direction);
           this.parent.nextLink = link;
           this.parent = link;
-          this._addParticle(link.endParticle());
-          return this.prune = null;
+          return this._addParticle(link.endParticle());
         }
       } else {
-        link = new Link(name, this.parent, this.parent.endParticle(), extent * this.stride, this.direction);
+        link = new Link(name, color, this.parent, this.parent.endParticle(), extent * this.stride, this.direction);
         this.parent.nextLink = link;
         this.parent = link;
-        this._addParticle(link.startParticle);
-        return this.prune = null;
-      }
-    };
-
-    InstructionVisitor.prototype.markDeadParticles = function() {
-      var dead;
-      dead = this._markDeadParticles(this.prune);
-      this.prune.parent.nextLink = null;
-      return dead;
-    };
-
-    InstructionVisitor.prototype._markDeadParticles = function(curr) {
-      if (curr != null) {
-        curr.endParticle().dead = true;
-        return this._markDeadParticles(curr.nextLink);
+        return this._addParticle(link.endParticle());
       }
     };
 
     InstructionVisitor.prototype._addParticle = function(particle) {
+      console.log("add");
+      console.dir(particle);
       if (this.composite == null) {
         this.composite = new VerletJS.Composite();
+        this.composite.drawParticles = this._drawParticles;
       }
       return this.composite.particles.push(particle);
+    };
+
+    InstructionVisitor.prototype._drawParticles = function(ctx, composite) {
+      var particle, _i, _len, _ref, _results;
+      _ref = composite.particles;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        particle = _ref[_i];
+        if (particle.link != null) {
+          ctx.beginPath();
+          ctx.arc(particle.pos.x, particle.pos.y, 2, 0, 2 * Math.PI);
+          ctx.fillStyle = particle.link.color;
+          _results.push(ctx.fill());
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
 
     InstructionVisitor.prototype.visitNested = function(nested) {
@@ -154,28 +170,27 @@
       if (visitor.composite != null) {
         this.sim.composites.push(visitor.composite);
       }
-      if (visitor.prune != null) {
-        visitor.markDeadParticles();
-        return this._removeDeadParticles();
-      }
+      return this._removeDeadParticles();
     };
 
     View.prototype._removeDeadParticles = function() {
-      var composite, _i, _len, _ref, _results,
+      var composite, _i, _len, _ref,
         _this = this;
       console.dir();
       _ref = this.sim.composites;
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         composite = _ref[_i];
         console.log("before/after");
         console.dir(composite.particles);
         composite.particles = _.filter(composite.particles, function(p) {
-          return p.dead == null;
+          var _ref1;
+          return !((_ref1 = p.link) != null ? _ref1.dead : void 0);
         });
-        _results.push(console.dir(composite.particles));
+        console.dir(composite.particles);
       }
-      return _results;
+      return this.sim.composites = _.filter(this.sim.composites, function(c) {
+        return c.particles.length > 0;
+      });
     };
 
     return View;
