@@ -5,7 +5,7 @@
 </head>
 <body>
     <canvas id="crochet" style="width: 800px; height: 400px;"></canvas>
-    <input type="text" data-bind="value: spec" />
+    <input type="text" data-bind="value: spec, valueUpdate: 'afterkeydown'" />
     <script type="text/javascript" src="bower_components/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="bower_components/knockout.js/knockout.js"></script>
     <script type="text/javascript" src="bower_components/verlet/js/verlet-1.0.0.min.js"></script>
