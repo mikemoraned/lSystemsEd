@@ -20,12 +20,14 @@
   })();
 
   Link = (function() {
-    function Link(name, color, startParticle, extent, direction) {
+    function Link(name, color, parent, startParticle, extent, direction) {
       this.name = name;
       this.color = color;
+      this.parent = parent;
       this.startParticle = startParticle;
       this.extent = extent;
       this.direction = direction;
+      this.unlink = __bind(this.unlink, this);
       this.markDead = __bind(this.markDead, this);
       this.endParticle = __bind(this.endParticle, this);
       this.end = new Particle(this.startParticle.pos.add(this.direction.scale(this.extent)));
@@ -43,6 +45,10 @@
         this.nextLink.markDead();
       }
       return this.dead = true;
+    };
+
+    Link.prototype.unlink = function() {
+      return this.parent.nextLink = this.nextLink;
     };
 
     return Link;
@@ -71,7 +77,7 @@
         this.parent.nextLink.dead = false;
         return this.parent = this.parent.nextLink;
       } else {
-        link = new Link(name, color, this.parent.endParticle(), extent * this.stride, this.direction);
+        link = new Link(name, color, this.parent, this.parent.endParticle(), extent * this.stride, this.direction);
         this.parent.nextLink = link;
         this.parent = link;
         return this._addParticle(link.endParticle());
@@ -131,6 +137,7 @@
     function View(model, id) {
       this.model = model;
       this._removeDeadParticles = __bind(this._removeDeadParticles, this);
+      this._removeDeadLinks = __bind(this._removeDeadLinks, this);
       this._onEvaluationChange = __bind(this._onEvaluationChange, this);
       this._loop = __bind(this._loop, this);
       this._setup(id);
@@ -169,13 +176,39 @@
       if (visitor.composite != null) {
         this.sim.composites.push(visitor.composite);
       }
+      this._removeDeadLinks();
       return this._removeDeadParticles();
+    };
+
+    View.prototype._removeDeadLinks = function() {
+      var composite, deadLink, _i, _len, _ref, _results;
+      _ref = this.sim.composites;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        composite = _ref[_i];
+        _results.push((function() {
+          var _j, _len1, _ref1, _results1,
+            _this = this;
+          _ref1 = _.chain(composite.particles).filter(function(p) {
+            var _ref1;
+            return (_ref1 = p.link) != null ? _ref1.dead : void 0;
+          }).map(function(p) {
+            return p.link;
+          }).value();
+          _results1 = [];
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            deadLink = _ref1[_j];
+            _results1.push(deadLink.unlink());
+          }
+          return _results1;
+        }).call(this));
+      }
+      return _results;
     };
 
     View.prototype._removeDeadParticles = function() {
       var composite, _i, _len, _ref,
         _this = this;
-      console.dir();
       _ref = this.sim.composites;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         composite = _ref[_i];

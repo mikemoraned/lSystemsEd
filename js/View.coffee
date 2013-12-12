@@ -5,7 +5,7 @@ class Root
   endParticle: () => @end
 
 class Link
-  constructor: (@name, @color, @startParticle, @extent, @direction) ->
+  constructor: (@name, @color, @parent, @startParticle, @extent, @direction) ->
     @end = new Particle(@startParticle.pos.add(@direction.scale(@extent)))
     @end.link = this
     @dead = false
@@ -17,6 +17,9 @@ class Link
     if @nextLink?
       @nextLink.markDead()
     @dead = true
+
+  unlink: () =>
+    @parent.nextLink = @nextLink
 
 class InstructionVisitor
 
@@ -33,7 +36,7 @@ class InstructionVisitor
       @parent.nextLink.dead = false
       @parent = @parent.nextLink
     else
-      link = new Link(name, color, @parent.endParticle(), extent * @stride, @direction)
+      link = new Link(name, color, @parent, @parent.endParticle(), extent * @stride, @direction)
       @parent.nextLink = link
       @parent = link
       @_addParticle(link.endParticle())
@@ -107,10 +110,16 @@ class View
     change.accept(visitor)
     if visitor.composite?
       @sim.composites.push(visitor.composite)
+    @_removeDeadLinks()
     @_removeDeadParticles()
 
+  _removeDeadLinks: () =>
+    for composite in @sim.composites
+      for deadLink in _.chain(composite.particles).filter((p) => p.link?.dead).map((p) => p.link).value()
+        deadLink.unlink()
+
+
   _removeDeadParticles: () =>
-    console.dir()
     for composite in @sim.composites
       console.log("before/after")
       console.dir(composite.particles)
