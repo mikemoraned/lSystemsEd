@@ -3,7 +3,7 @@
   var _this = this;
 
   describe('Node', function() {
-    var nextUntilEnd;
+    var assertHasIterationEqual, nextUntilEnd;
     nextUntilEnd = function(iter) {
       var names;
       names = [];
@@ -14,18 +14,57 @@
       }
       return names;
     };
-    return describe('read-only iteration', function() {
+    assertHasIterationEqual = function(tree, expected) {
+      var names;
+      names = nextUntilEnd(tree.iterator());
+      return assert.deepEqual(names, expected);
+    };
+    describe('read-only iteration', function() {
       it('single node', function() {
-        var names, tree;
+        var tree;
         tree = new Node("A");
-        names = nextUntilEnd(tree.iterator());
-        return assert.deepEqual(names, ["A"]);
+        return assertHasIterationEqual(tree, ["A"]);
       });
-      return it('non-empty, multi-level', function() {
-        var names, tree;
-        tree = new Node("A", new Node("B", new Node("A")));
-        names = nextUntilEnd(tree.iterator());
-        return assert.deepEqual(names, ["A", "B", "A"]);
+      return it('non-empty, multi-level tree', function() {
+        var tree;
+        tree = new Node("A", new Node("B", new Node("C")));
+        return assertHasIterationEqual(tree, ["A", "B", "C"]);
+      });
+    });
+    return describe('replacement', function() {
+      it('single node, single node replacement', function() {
+        var iter, tree;
+        tree = new Node("A");
+        iter = tree.iterator();
+        iter.replaceWith(new Node("B"));
+        assert.deepEqual(nextUntilEnd(iter), ["B"]);
+        return assertHasIterationEqual(tree, ["B"]);
+      });
+      it('single node, multi-level replacement', function() {
+        var iter, tree;
+        tree = new Node("A");
+        iter = tree.iterator();
+        iter.replaceWith(new Node("B", new Node("C")));
+        assert.deepEqual(nextUntilEnd(iter), ["B", "C"]);
+        return assertHasIterationEqual(tree, ["B", "C"]);
+      });
+      it('multi-level tree, single-node replacement, in middle', function() {
+        var iter, tree;
+        tree = new Node("A", new Node("B", new Node("C")));
+        iter = tree.iterator();
+        iter.next();
+        iter.replaceWith(new Node("D"));
+        assert.deepEqual(nextUntilEnd(iter), ["D"]);
+        return assertHasIterationEqual(tree, ["A", "D"]);
+      });
+      return it('multi-level tree, multi-level replacement, in middle', function() {
+        var iter, tree;
+        tree = new Node("A", new Node("B", new Node("C")));
+        iter = tree.iterator();
+        iter.next();
+        iter.replaceWith(new Node("D", new Node("E")));
+        assert.deepEqual(nextUntilEnd(iter), ["D", "E"]);
+        return assertHasIterationEqual(tree, ["A", "D", "E"]);
       });
     });
   });
