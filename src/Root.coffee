@@ -1,4 +1,5 @@
 class Root
+
   constructor: (@origin, @nextLink = null) ->
     @end = new Particle(@origin)
 

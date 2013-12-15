@@ -1,22 +1,17 @@
 class InstructionVisitor
 
-  constructor: (@origin, @parent) ->
-    @direction = new Vec2(0.0, -1.0)
-    @stride = 20.0
-    @composite = null
-    if @parent.nextLink?
-      @parent.nextLink.markDead()
+  constructor: (@pen) ->
 
-  visitForward: (name, color, extent) =>
-
-    if @parent.nextLink? && @parent.nextLink.name == name
-      @parent.nextLink.dead = false
-      @parent = @parent.nextLink
-    else
-      link = new Link(name, color, @parent, @parent.endParticle(), extent * @stride, @direction)
-      @parent.nextLink = link
-      @parent = link
-      @_addParticle(link.endParticle())
+  visitForward: (name, extent) =>
+    @pen.drawLink(name, extent)
+#    if @curr.nextLink? && @curr.nextLink.name == name
+#      @curr = @pen.jumpTo(@curr.nextLink)
+#    else
+#      @pen.drawLink()
+#      link = new Link(name, color, @parent, @parent.endParticle(), extent * @stride, @direction)
+#      @parent.nextLink = link
+#      @parent = link
+#      @_addParticle(link.endParticle())
 
   _addParticle: (particle) =>
     console.log("add")

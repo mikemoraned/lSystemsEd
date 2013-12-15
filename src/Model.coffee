@@ -1,8 +1,8 @@
 class Forward
-  constructor: (@name, @color) ->
+  constructor: (@name) ->
 
   accept: (visitor) =>
-    visitor.visitForward(@name, @color, 1.0)
+    visitor.visitForward(@name, 1.0)
 
 class Nested
   constructor: (@nested) ->
@@ -14,8 +14,8 @@ class Model
 
   constructor: (spec = "A") ->
     @commands = {}
-    @commands["A"] = new Forward("A", "blue")
-    @commands["B"] = new Forward("B", "red")
+    @commands["A"] = new Forward("A")
+    @commands["B"] = new Forward("B")
     @spec = ko.observable(spec)
     @evaluated = ko.computed(() =>
       new Nested(@spec().split("").map((i) => @commands[i]))
