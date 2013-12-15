@@ -11,10 +11,20 @@ class DepthFirstIterator
     if !@hasNext()
       throw new Error("no next node")
     @node = @stack.pop()
+    @
 
   replaceWith: (newNode) =>
     @node.name = newNode.name
     @node.next = newNode.next
+    @
+
+  append: (newNext) =>
+    if @node.next?
+      throw new Error("illegal operation")
+    @node.next = newNext
+
+  cut: () =>
+    @node.next = null
 
   _findNextNode: () =>
     if @stack.length == 0

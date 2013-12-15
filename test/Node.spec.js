@@ -31,7 +31,7 @@
         return assertHasIterationEqual(tree, ["A", "B", "C"]);
       });
     });
-    return describe('replacement', function() {
+    describe('replacement', function() {
       it('single node, single node replacement', function() {
         var iter, tree;
         tree = new Node("A");
@@ -65,6 +65,85 @@
         iter.replaceWith(new Node("D", new Node("E")));
         assert.deepEqual(nextUntilEnd(iter), ["D", "E"]);
         return assertHasIterationEqual(list, ["A", "D", "E"]);
+      });
+    });
+    describe('append', function() {
+      it('single node, single node append', function() {
+        var iter, tree;
+        tree = new Node("A");
+        iter = tree.iterator();
+        iter.append(new Node("B"));
+        assert.deepEqual(nextUntilEnd(iter), ["A", "B"]);
+        return assertHasIterationEqual(tree, ["A", "B"]);
+      });
+      it('single node, multi-level append', function() {
+        var iter, list;
+        list = new Node("A");
+        iter = list.iterator();
+        iter.append(new Node("B", new Node("C")));
+        assert.deepEqual(nextUntilEnd(iter), ["A", "B", "C"]);
+        return assertHasIterationEqual(list, ["A", "B", "C"]);
+      });
+      it('multi-level list, single-node append, in middle', function() {
+        var a, iter, list;
+        list = new Node("A", new Node("B", new Node("C")));
+        iter = list.iterator();
+        iter.next();
+        a = function() {
+          return iter.append(new Node("D"));
+        };
+        assert["throw"](a, /illegal operation/);
+        assert.deepEqual(nextUntilEnd(iter), ["B", "C"]);
+        return assertHasIterationEqual(list, ["A", "B", "C"]);
+      });
+      return it('multi-level list, multi-level append, in middle', function() {
+        var a, iter, list;
+        list = new Node("A", new Node("B", new Node("C")));
+        iter = list.iterator();
+        iter.next();
+        a = function() {
+          return iter.append(new Node("D", new Node("E")));
+        };
+        assert["throw"](a, /illegal operation/);
+        assert.deepEqual(nextUntilEnd(iter), ["B", "C"]);
+        return assertHasIterationEqual(list, ["A", "B", "C"]);
+      });
+    });
+    return describe('cut', function() {
+      it('single node, cut', function() {
+        var iter, tree;
+        tree = new Node("A");
+        iter = tree.iterator();
+        iter.append(new Node("B"));
+        assert.deepEqual(nextUntilEnd(iter), ["A", "B"]);
+        return assertHasIterationEqual(tree, ["A", "B"]);
+      });
+      it('multi-level list, cut after start', function() {
+        var iter, list;
+        list = new Node("A", new Node("B", new Node("C")));
+        iter = list.iterator();
+        iter.cut();
+        assert.deepEqual(nextUntilEnd(iter), ["A"]);
+        return assertHasIterationEqual(list, ["A"]);
+      });
+      it('multi-level list, cut in middle', function() {
+        var iter, list;
+        list = new Node("A", new Node("B", new Node("C")));
+        iter = list.iterator();
+        iter.next();
+        iter.cut();
+        assert.deepEqual(nextUntilEnd(iter), ["B"]);
+        return assertHasIterationEqual(list, ["A", "B"]);
+      });
+      return it('multi-level list, cut at end', function() {
+        var iter, list;
+        list = new Node("A", new Node("B", new Node("C")));
+        iter = list.iterator();
+        iter.next();
+        iter.next();
+        iter.cut();
+        assert.deepEqual(nextUntilEnd(iter), ["C"]);
+        return assertHasIterationEqual(list, ["A", "B", "C"]);
       });
     });
   });

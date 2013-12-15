@@ -7,6 +7,8 @@
     function DepthFirstIterator(node) {
       this.node = node;
       this._findNextNode = __bind(this._findNextNode, this);
+      this.cut = __bind(this.cut, this);
+      this.append = __bind(this.append, this);
       this.replaceWith = __bind(this.replaceWith, this);
       this.next = __bind(this.next, this);
       this.hasNext = __bind(this.hasNext, this);
@@ -22,12 +24,25 @@
       if (!this.hasNext()) {
         throw new Error("no next node");
       }
-      return this.node = this.stack.pop();
+      this.node = this.stack.pop();
+      return this;
     };
 
     DepthFirstIterator.prototype.replaceWith = function(newNode) {
       this.node.name = newNode.name;
-      return this.node.next = newNode.next;
+      this.node.next = newNode.next;
+      return this;
+    };
+
+    DepthFirstIterator.prototype.append = function(newNext) {
+      if (this.node.next != null) {
+        throw new Error("illegal operation");
+      }
+      return this.node.next = newNext;
+    };
+
+    DepthFirstIterator.prototype.cut = function() {
+      return this.node.next = null;
     };
 
     DepthFirstIterator.prototype._findNextNode = function() {
