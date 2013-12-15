@@ -2,11 +2,17 @@
 (function() {
   var _this = this;
 
-  describe('Array', function() {
-    return describe('#indexOf()', function() {
-      return it('should return -1 when the value is not present', function() {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        return assert.equal(-1, [1, 2, 3].indexOf(0));
+  describe('InstructionVisitor', function() {
+    return describe('basic', function() {
+      var origin;
+      origin = new Vec2(0.0, -1.0);
+      return describe('visitForward', function() {
+        return it('single forward moves one unit in default direction', function() {
+          var parent, visitor;
+          parent = new Root(origin);
+          visitor = new InstructionVisitor(origin, parent);
+          return assert.equal(false, true, "to be completed");
+        });
       });
     });
   });

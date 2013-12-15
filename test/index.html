@@ -5,15 +5,20 @@
     <link rel="stylesheet" href="../bower_components/mocha/mocha.css" />
 </head>
 <body>
-<div id="mocha"></div>
-<script src="../bower_components/mocha/mocha.js"></script>
-<script src="../bower_components/chai/chai.js"></script>
-<script>assert = chai.assert</script>
-<script>mocha.setup('bdd')</script>
-<script src="InstructionVisitor.spec.js"></script>
-<script>
-    mocha.checkLeaks();
-    mocha.run();
-</script>
+    <div id="mocha"></div>
+    <script src="../bower_components/mocha/mocha.js"></script>
+    <script src="../bower_components/chai/chai.js"></script>
+    <script>assert = chai.assert</script>
+    <script>mocha.setup('bdd')</script>
+    <script type="text/javascript" src="../bower_components/knockout.js/knockout.js"></script>
+    <script type="text/javascript" src="../bower_components/verlet/js/verlet-1.0.0.min.js"></script>
+    <script type="text/javascript" src="../src/Root.js"></script>
+    <script type="text/javascript" src="../src/Link.js"></script>
+    <script type="text/javascript" src="../src/InstructionVisitor.js"></script>
+    <script type="text/javascript" src="InstructionVisitor.spec.js"></script>
+    <script>
+        mocha.checkLeaks();
+        mocha.run();
+    </script>
 </body>
 </html>

@@ -1,8 +1,14 @@
-describe('Array', () =>
-  describe('#indexOf()', () =>
-    it('should return -1 when the value is not present', () =>
-      assert.equal(-1, [1,2,3].indexOf(5))
-      assert.equal(-1, [1,2,3].indexOf(0))
+describe('InstructionVisitor', () =>
+  describe('basic', () =>
+
+    origin = new Vec2(0.0, -1.0)
+
+    describe('visitForward', () =>
+      it('single forward moves one unit in default direction', () =>
+        parent = new Root(origin)
+        visitor = new InstructionVisitor(origin, parent)
+        assert.equal(false, true, "to be completed")
+      )
     )
   )
 )
