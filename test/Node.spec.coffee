@@ -39,35 +39,35 @@ describe('Node', () =>
     )
 
     it('single node, multi-level replacement', () =>
-      tree = new Node("A")
+      list = new Node("A")
 
-      iter = tree.iterator()
+      iter = list.iterator()
       iter.replaceWith(new Node("B", new Node("C")))
 
       assert.deepEqual(nextUntilEnd(iter), ["B","C"])
-      assertHasIterationEqual(tree, ["B","C"])
+      assertHasIterationEqual(list, ["B","C"])
     )
 
-    it('multi-level tree, single-node replacement, in middle', () =>
-      tree = new Node("A", new Node("B", new Node("C")))
+    it('multi-level list, single-node replacement, in middle', () =>
+      list = new Node("A", new Node("B", new Node("C")))
 
-      iter = tree.iterator()
+      iter = list.iterator()
       iter.next()
       iter.replaceWith(new Node("D"))
 
       assert.deepEqual(nextUntilEnd(iter), ["D"])
-      assertHasIterationEqual(tree, ["A","D"])
+      assertHasIterationEqual(list, ["A","D"])
     )
 
-    it('multi-level tree, multi-level replacement, in middle', () =>
-      tree = new Node("A", new Node("B", new Node("C")))
+    it('multi-level list, multi-level replacement, in middle', () =>
+      list = new Node("A", new Node("B", new Node("C")))
 
-      iter = tree.iterator()
+      iter = list.iterator()
       iter.next()
       iter.replaceWith(new Node("D", new Node("E")))
 
       assert.deepEqual(nextUntilEnd(iter), ["D","E"])
-      assertHasIterationEqual(tree, ["A","D","E"])
+      assertHasIterationEqual(list, ["A","D","E"])
     )
   )
 )
