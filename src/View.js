@@ -6,8 +6,6 @@
   View = (function() {
     function View(model, id) {
       this.model = model;
-      this._removeDeadParticles = __bind(this._removeDeadParticles, this);
-      this._removeDeadLinks = __bind(this._removeDeadLinks, this);
       this._onEvaluationChange = __bind(this._onEvaluationChange, this);
       this._loop = __bind(this._loop, this);
       this._setup(id);
@@ -27,7 +25,6 @@
       this.sim.friction = 0.3;
       this.sim.gravity = new Vec2(0.0, 0.0);
       this.origin = new Vec2(width / 2, 3 * height / 4);
-      this.root = new Root(this.origin);
       this._onEvaluationChange(this.model.evaluated());
       return this._loop();
     };
@@ -39,60 +36,11 @@
     };
 
     View.prototype._onEvaluationChange = function(change) {
-      var visitor;
+      var builder;
       console.dir(change);
-      visitor = new InstructionVisitor(this.origin, this.root);
-      change.accept(visitor);
-      if (visitor.composite != null) {
-        this.sim.composites.push(visitor.composite);
-      }
-      this._removeDeadLinks();
-      return this._removeDeadParticles();
-    };
-
-    View.prototype._removeDeadLinks = function() {
-      var composite, deadLink, _i, _len, _ref, _results;
-      _ref = this.sim.composites;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        composite = _ref[_i];
-        _results.push((function() {
-          var _j, _len1, _ref1, _results1,
-            _this = this;
-          _ref1 = _.chain(composite.particles).filter(function(p) {
-            var _ref1;
-            return (_ref1 = p.link) != null ? _ref1.dead : void 0;
-          }).map(function(p) {
-            return p.link;
-          }).value();
-          _results1 = [];
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            deadLink = _ref1[_j];
-            _results1.push(deadLink.unlink());
-          }
-          return _results1;
-        }).call(this));
-      }
-      return _results;
-    };
-
-    View.prototype._removeDeadParticles = function() {
-      var composite, _i, _len, _ref,
-        _this = this;
-      _ref = this.sim.composites;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        composite = _ref[_i];
-        console.log("before/after");
-        console.dir(composite.particles);
-        composite.particles = _.filter(composite.particles, function(p) {
-          var _ref1;
-          return !((_ref1 = p.link) != null ? _ref1.dead : void 0);
-        });
-        console.dir(composite.particles);
-      }
-      return this.sim.composites = _.filter(this.sim.composites, function(c) {
-        return c.particles.length > 0;
-      });
+      this.root = new Node("root");
+      builder = new VerletNodeBuilder(this.origin, this.root, this.sim);
+      return change.accept(builder);
     };
 
     return View;
