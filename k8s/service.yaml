@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: lsystemsed
+  namespace: lsystemsed
+spec:
+  # type: NodePort
+  type: LoadBalancer
+  selector:
+    app: lsystemsed
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
