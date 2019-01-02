@@ -17,12 +17,15 @@ spec:
     spec:
       containers:
         - name: lsystemsed
-          image: houseofmoran/lsystemsed:0.6.1_2
+          image: houseofmoran/lsystemsed:0.6.1_3
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms300m -Xmx400m"
           resources:
-            limits:
-              memory: 500Mi
             requests:
-              memory: 500Mi
+              memory: 400Mi
+            limits:
+              memory: 1Gi
           ports:
             - name: http
               containerPort: 8000

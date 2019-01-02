@@ -1,4 +1,12 @@
 # Build and push
 
-    docker build -t houseofmoran/lsystemsed:0.6.1_2 .
-    docker push houseofmoran/lsystemsed:0.6.1_2
+    docker build -t houseofmoran/lsystemsed:0.6.1_3 .
+    docker push houseofmoran/lsystemsed:0.6.1_3
+
+# Apply
+
+First, set up kubectl to point at a cluster (e.g. [Digital Ocean](./k8s/README.do.md)) then do:
+
+    kubectl apply -f k8s/namespace.yaml
+    kubectl apply -f k8s/deployment.yaml
+    kubectl apply -f k8s/service.yaml

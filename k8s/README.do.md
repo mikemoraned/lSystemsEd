@@ -6,5 +6,3 @@ Following creates/destroys a dev cluster on Digital Ocean, automatically setting
     kubectl config use-context do-nyc1-lsystemsed-dev
     kubectl config set-context do-nyc1-lsystemsed-dev --namespace lsystemsed
     doctl kubernetes cluster delete lsystemsed-dev
-
-# Apply
