@@ -7,4 +7,6 @@ ENV PORT=8000
 COPY $JETTY /$JETTY
 COPY war/$WAR /$WAR
 
+EXPOSE ${PORT}
+
 CMD /usr/bin/java -jar /$JETTY --port $PORT /$WAR
