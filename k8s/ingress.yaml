@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: lsystemsed-ingress
+  namespace: lsystemsed
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - lsystems.do.houseofmoran.io
+        - lsystems-do.houseofmoran.com
+      secretName: letsencrypt-prod
+  rules:
+    - host: lsystems.do.houseofmoran.io
+      http: &http
+        paths:
+          - backend:
+              serviceName: lsystemsed
+              servicePort: 80
+    - host: lsystems-do.houseofmoran.com
+      http: *http

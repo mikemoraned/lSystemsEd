@@ -4,8 +4,7 @@ metadata:
   name: lsystemsed
   namespace: lsystemsed
 spec:
-  # type: NodePort
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: lsystemsed
   ports:
