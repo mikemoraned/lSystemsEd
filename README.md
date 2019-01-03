@@ -5,7 +5,7 @@
 
 # Apply
 
-First, set up kubectl to point at a cluster (e.g. [Digital Ocean](./k8s/README.do.md)) then do:
+First, set up kubectl to point at a cluster (e.g. [Digital Ocean](https://github.com/mikemoraned/k8s-clusters/blob/master/do/README.md)) then do:
 
     kubectl apply -f k8s/namespace.yaml
     export NAMESPACE=lsystemsed
