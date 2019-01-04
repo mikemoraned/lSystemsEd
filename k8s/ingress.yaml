@@ -11,6 +11,7 @@ spec:
     - hosts:
         - lsystems.do.houseofmoran.io
         - lsystems-do.houseofmoran.com
+        - lsystems.houseofmoran.com
       secretName: letsencrypt-prod
   rules:
     - host: lsystems.do.houseofmoran.io
@@ -20,4 +21,6 @@ spec:
               serviceName: lsystemsed
               servicePort: 80
     - host: lsystems-do.houseofmoran.com
+      http: *http
+    - host: lsystems.houseofmoran.com
       http: *http
