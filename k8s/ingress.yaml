@@ -10,7 +10,6 @@ spec:
   tls:
     - hosts:
         - lsystems.do.houseofmoran.io
-        - lsystems-do.houseofmoran.com
         - lsystems.houseofmoran.com
       secretName: letsencrypt-prod
   rules:
@@ -20,7 +19,5 @@ spec:
           - backend:
               serviceName: lsystemsed
               servicePort: 80
-    - host: lsystems-do.houseofmoran.com
-      http: *http
     - host: lsystems.houseofmoran.com
       http: *http
