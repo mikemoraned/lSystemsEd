@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: lsystemsed
-          image: houseofmoran/lsystemsed:0.6.1_3
+          image: ghcr.io/mikemoraned/lsystemsed:refactor-latest-jdk-and-jetty-2
           env:
             - name: JAVA_OPTS
               value: "-Xms300m -Xmx400m"
