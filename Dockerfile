@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-alpine
+FROM adoptopenjdk:15-jre-hotspot
 
 ENV JETTY=jetty-runner-8.1.0.RC2.jar
 ENV WAR=2011278Tn8-LSystems_2.8.1-0.6.1.war
@@ -10,4 +10,4 @@ COPY war/$WAR /$WAR
 
 EXPOSE ${PORT}
 
-CMD /usr/bin/java $JAVA_OPTS -jar /$JETTY --port $PORT /$WAR
+CMD /opt/java/openjdk/bin/java $JAVA_OPTS -jar /$JETTY --port $PORT /$WAR
