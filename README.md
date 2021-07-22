@@ -1,14 +1,33 @@
-# Build and push
+# Fly.io
 
-    docker build -t houseofmoran/lsystemsed:0.6.1_3 .
-    docker push houseofmoran/lsystemsed:0.6.1_3
+## Create
 
-# Apply
+Create app:
 
-First, set up kubectl to point at a cluster (e.g. [Digital Ocean](https://github.com/mikemoraned/k8s-clusters/blob/master/do/README.md)) then do:
+    flyctl apps create lsystems-houseofmoran --builder dockerfile --no-config
 
-    kubectl apply -f k8s/namespace.yaml
-    export NAMESPACE=lsystemsed
-    kubectl apply --namespace=${NAMESPACE} -f k8s/deployment.yaml
-    kubectl apply --namespace=${NAMESPACE} -f k8s/service.yaml
-    kubectl apply --namespace=${NAMESPACE} -f k8s/ingress.yaml
+## Deploy
+
+Deploy app (this will use the settings in `fly.toml`):
+
+    flyctl deploy
+
+Open app:
+
+    flyctl open
+
+## Domains / SSL
+
+Get IPs:
+
+    flyctl ips list
+
+Add the `v4` IP as an `A` record and the `v6` IP as the `AAAA` record
+
+Once that has propagated, create the cert for the domain:
+
+    flyctl certs create lsystems.houseofmoran.com
+
+Show status:
+
+    flyctl certs show lsystems.houseofmoran.com

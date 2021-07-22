@@ -1,6 +1,4 @@
-# fly.toml file generated for bold-glitter-7266 on 2021-07-14T21:53:13+01:00
-
-app = "bold-glitter-7266"
+app = "lsystems-houseofmoran"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
